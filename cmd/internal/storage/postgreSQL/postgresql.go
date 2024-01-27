@@ -6,6 +6,7 @@ import (
 
 	"github.com/4aykovski/tg-notion-bot/cmd/internal/storage"
 	"github.com/4aykovski/tg-notion-bot/lib/helpers"
+	_ "github.com/lib/pq"
 )
 
 type Storage struct {
