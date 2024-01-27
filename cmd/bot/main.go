@@ -4,7 +4,12 @@ import (
 	"flag"
 	"log"
 
+	"github.com/4aykovski/tg-notion-bot/cmd/internal/client/telegram"
 	zapLogger "github.com/4aykovski/tg-notion-bot/pkg/zap-logger"
+)
+
+const (
+	tgBotHost = "api.telegram.org"
 )
 
 func main() {
@@ -12,9 +17,7 @@ func main() {
 
 	token := mustToken()
 
-	logger.Info(token)
-
-	// tgClient = telegram.New(token)
+	tgClient := telegram.New(tgBotHost, token)
 
 	// fetcerh = fetcher.New(tgClient)
 
