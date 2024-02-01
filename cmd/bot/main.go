@@ -1,43 +1,47 @@
 package main
 
 import (
-	"flag"
-	"log"
-
-	"github.com/4aykovski/tg-notion-bot/cmd/internal/client/telegram"
+	"github.com/4aykovski/tg-notion-bot/config"
+	gigachatClient "github.com/4aykovski/tg-notion-bot/internal/client/gigachat"
+	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
+	salutespeechClient "github.com/4aykovski/tg-notion-bot/internal/client/salutespeech"
+	telegramClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
+	"github.com/4aykovski/tg-notion-bot/internal/consumer/eventConsumer"
+	eventProcessor "github.com/4aykovski/tg-notion-bot/internal/events/event-processor"
 	zapLogger "github.com/4aykovski/tg-notion-bot/pkg/zap-logger"
 )
 
-const (
-	tgBotHost = "api.telegram.org"
-)
-
 func main() {
-	logger := zapLogger.New("development")
+	logger := zapLogger.New(config.Type)
 
-	token := mustToken()
-
-	tgClient := telegram.New(tgBotHost, token)
-
-	// fetcerh = fetcher.New(tgClient)
-
-	// processor = fetcher.New(tgClient)
-
-	// cosumer.Start(fetcher, processor)
-
-}
-
-func mustToken() string {
-	token := flag.String(
-		"bot-token",
-		"",
-		"token for access to telegram bot",
-	)
-	flag.Parse()
-
-	if *token == "" {
-		log.Fatal("token is not specified")
+	tgClient, err := telegramClient.New(config.TgBotHost, config.TgBotToken)
+	if err != nil {
+		logger.Fatal(err.Error())
 	}
 
-	return *token
+	spClient, err := salutespeechClient.New(config.SalutespeechToken)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	gcClient, err := gigachatClient.New(config.GigaChatToken)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	notClient, err := notion.New(config.NotionIntegrationToken)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	eP := eventProcessor.New(gcClient, spClient, tgClient, notClient)
+
+	logger.Info("service started")
+
+	consumer := eventConsumer.New(eP, eP, config.BatchSize)
+
+	if err := consumer.Start(); err != nil {
+		logger.Fatal(err.Error())
+	}
+
 }
