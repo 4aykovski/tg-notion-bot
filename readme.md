@@ -23,3 +23,7 @@ Now it uses local notion integration but it will be improved in the future by us
 - You need to register your telegram bot through [BotFather](https://t.me/BotFather) and get its access token.
 - Configure config
 - Enjoy!
+
+# WARNING
+
+- **DO NOT USE THE BOT IN PUBLIC. NOW IT CAN'T BE USED THERE.** 
