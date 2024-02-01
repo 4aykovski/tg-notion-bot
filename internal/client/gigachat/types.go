@@ -48,9 +48,3 @@ type choice struct {
 type responseBody struct {
 	Choices []choice `json:"choices,omitempty"`
 }
-
-type JsonAnswer struct {
-	Result  string `json:"result,omitempty"`
-	Summary string `json:"summary,omitempty"`
-	Name    string `json:"name,omitempty"`
-}

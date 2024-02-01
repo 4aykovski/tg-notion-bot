@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/4aykovski/tg-notion-bot/config"
-	"github.com/4aykovski/tg-notion-bot/internal/client/gigachat"
 	"github.com/4aykovski/tg-notion-bot/lib/helpers"
 )
 
@@ -24,6 +23,12 @@ type Client struct {
 	basePath string
 	token    string
 	client   http.Client
+}
+
+type JsonAnswer struct {
+	Result  string `json:"result,omitempty"`
+	Summary string `json:"summary,omitempty"`
+	Name    string `json:"name,omitempty"`
 }
 
 func New(token string) (*Client, error) {
@@ -41,7 +46,7 @@ func New(token string) (*Client, error) {
 func (c *Client) CreateNewPageInDatabase(dbId string, pageData string) (err error) {
 	defer func() { err = helpers.ErrWrapIfNotNil("can't create notion page", err) }()
 
-	var pData gigachat.JsonAnswer
+	var pData JsonAnswer
 	if err = json.Unmarshal([]byte(pageData), &pData); err != nil {
 		return err
 	}
