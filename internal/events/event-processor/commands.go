@@ -21,12 +21,12 @@ func (p *Processor) doCmdIfVoice(voice telegram.Voice, chatId int, username stri
 		return err
 	}
 
-	voiceText, err := p.sp.SpeechRecognizeOgg(fileName(f.FilePath))
+	voiceText, err := p.speechAnalyzer.SpeechRecognizeOgg(fileName(f.FilePath))
 	if err != nil {
 		return err
 	}
 
-	editedText, err := p.gc.Completions(voiceText)
+	editedText, err := p.aiBot.Completions(voiceText)
 	if err != nil {
 		return err
 	}

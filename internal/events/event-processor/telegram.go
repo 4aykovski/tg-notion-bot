@@ -4,9 +4,7 @@ import (
 	"errors"
 
 	"github.com/4aykovski/tg-notion-bot/config"
-	gcClient "github.com/4aykovski/tg-notion-bot/internal/client/gigachat"
 	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
-	spClient "github.com/4aykovski/tg-notion-bot/internal/client/salutespeech"
 	tgClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
 	"github.com/4aykovski/tg-notion-bot/lib/helpers"
@@ -20,13 +18,21 @@ var (
 	ErrUnknownDataType  = errors.New("unknown data type")
 )
 
+type speechAnalyzer interface {
+	SpeechRecognizeOgg(fileName string) (text string, err error)
+}
+
+type aiBot interface {
+	Completions(text string) (result string, err error)
+}
+
 type Processor struct {
-	tg     *tgClient.Client
-	sp     *spClient.Client
-	gc     *gcClient.Client
-	not    *notion.Client
-	offset int
-	logger *zapLogger.Logger
+	tg             *tgClient.Client
+	speechAnalyzer speechAnalyzer
+	aiBot          aiBot
+	not            *notion.Client
+	offset         int
+	logger         *zapLogger.Logger
 }
 
 type Meta struct {
@@ -40,17 +46,17 @@ type Data struct {
 }
 
 func New(
-	gigaChatClient *gcClient.Client,
-	salutespeechClient *spClient.Client,
+	aiBot aiBot,
+	speechAnalyzer speechAnalyzer,
 	telegramClient *tgClient.Client,
 	notionClient *notion.Client,
 ) *Processor {
 	return &Processor{
-		tg:     telegramClient,
-		sp:     salutespeechClient,
-		gc:     gigaChatClient,
-		not:    notionClient,
-		logger: zapLogger.New(config.Type),
+		tg:             telegramClient,
+		speechAnalyzer: speechAnalyzer,
+		aiBot:          aiBot,
+		not:            notionClient,
+		logger:         zapLogger.New(config.Type),
 	}
 }
 func (p *Processor) Fetch(limit int) ([]events.Event, error) {
