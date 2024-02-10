@@ -1,12 +1,12 @@
 package notion
 
-var (
-	TitleType       string = "title"
-	MultiSelectType string = "multi_select"
-	CheckboxType    string = "checkbox"
-	TextType        string = "text"
-	ParagraphType   string = "paragraph"
-	Heading2Type    string = "heading_2"
+const (
+	TitleType      = "title"
+	MultiSelectTyp = "multi_select"
+	CheckboxType   = "checkbox"
+	TextType       = "text"
+	ParagraphType  = "paragraph"
+	Heading2Type   = "heading_2"
 )
 
 type Text struct {

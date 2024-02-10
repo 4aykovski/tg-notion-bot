@@ -13,7 +13,7 @@ import (
 	"github.com/4aykovski/tg-notion-bot/lib/helpers"
 )
 
-var (
+const (
 	contentTypeJson  = "application/json"
 	createPageMethod = "/pages"
 )
