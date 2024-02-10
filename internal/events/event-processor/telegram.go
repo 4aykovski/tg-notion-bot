@@ -2,12 +2,12 @@ package eventProcessor
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/4aykovski/tg-notion-bot/config"
 	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
 	tgClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
-	"github.com/4aykovski/tg-notion-bot/lib/helpers"
 	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
@@ -62,11 +62,11 @@ func New(
 func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 	updates, err := p.tg.Updates(p.offset, limit)
 	if err != nil {
-		return nil, helpers.ErrWrapIfNotNil("can't get events", err)
+		return nil, fmt.Errorf("can't get events: %w", err)
 	}
 
 	if len(updates) == 0 {
-		return nil, ErrNoUpdates
+		return nil, fmt.Errorf("can't get events: %w", ErrNoUpdates)
 	}
 
 	res := make([]events.Event, 0, len(updates))
@@ -85,27 +85,27 @@ func (p *Processor) Process(event events.Event) error {
 	case events.Message:
 		return p.processMessage(event)
 	default:
-		return helpers.ErrWrapIfNotNil("can't process event", ErrUnknownEventType)
+		return fmt.Errorf("can't process event: %w", ErrUnknownEventType)
 	}
 }
 
 func (p *Processor) processMessage(event events.Event) error {
 	meta, err := meta(event)
 	if err != nil {
-		return helpers.ErrWrapIfNotNil("can't process event", err)
+		return fmt.Errorf("can't process event: %w", err)
 	}
 	data, err := data(event)
 	if err != nil {
-		return helpers.ErrWrapIfNotNil("can't process event", err)
+		return fmt.Errorf("can't process event: %w", err)
 	}
 
 	if data.Voice != (tgClient.Voice{}) {
-		if err := p.doCmdIfVoice(data.Voice, meta.ChatID, meta.Username); err != nil {
-			return helpers.ErrWrapIfNotNil("can't process event", err)
+		if err := p.doCmdIfVoice(data.Voice, meta.ChatID); err != nil {
+			return fmt.Errorf("can't process event: %w", err)
 		}
 	} else {
 		if err := p.doCmdIfText(data.Text, meta.ChatID, meta.Username); err != nil {
-			return helpers.ErrWrapIfNotNil("can't process event", err)
+			return fmt.Errorf("can't process event: %w", err)
 		}
 	}
 
@@ -115,7 +115,7 @@ func (p *Processor) processMessage(event events.Event) error {
 func data(event events.Event) (Data, error) {
 	res, ok := event.Data.(Data)
 	if !ok {
-		return Data{}, helpers.ErrWrapIfNotNil("can't get meta", ErrUnknownDataType)
+		return Data{}, fmt.Errorf("can't get data: %w", ErrUnknownDataType)
 	}
 
 	return res, nil
@@ -124,7 +124,7 @@ func data(event events.Event) (Data, error) {
 func meta(event events.Event) (Meta, error) {
 	res, ok := event.Meta.(Meta)
 	if !ok {
-		return Meta{}, helpers.ErrWrapIfNotNil("can't get meta", ErrUnknownMetaType)
+		return Meta{}, fmt.Errorf("can't get meta: %w", ErrUnknownMetaType)
 	}
 
 	return res, nil

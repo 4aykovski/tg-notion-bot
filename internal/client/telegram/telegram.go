@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/4aykovski/tg-notion-bot/config"
-	"github.com/4aykovski/tg-notion-bot/lib/helpers"
 	"github.com/cavaliergopher/grab/v3"
 )
 
@@ -28,7 +27,7 @@ type Client struct {
 
 func New(host string, token string) (*Client, error) {
 	if token == "" {
-		return nil, helpers.ErrWrapIfNotNil("can't create telegram client", fmt.Errorf("token wasn't specified"))
+		return nil, fmt.Errorf("can't create telegram client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
 		host:     host,
@@ -42,7 +41,6 @@ func newBasePath(token string) string {
 }
 
 func (c *Client) Updates(offset int, limit int) (updates []Update, err error) {
-	defer func() { err = helpers.ErrWrapIfNotNil("can't get updates", err) }()
 
 	q := url.Values{}
 	q.Add("offset", strconv.Itoa(offset))
@@ -50,13 +48,13 @@ func (c *Client) Updates(offset int, limit int) (updates []Update, err error) {
 
 	data, err := c.doRequest(getUpdatesMethod, q)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't get updates: %w", err)
 	}
 
 	var res UpdatesResponse
 
 	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't get updates: %w", err)
 	}
 
 	return res.Result, nil
@@ -69,7 +67,7 @@ func (c *Client) SendMessage(chatId int, text string) error {
 
 	_, err := c.doRequest(sendMessageMethod, q)
 	if err != nil {
-		return helpers.ErrWrapIfNotNil("can't send message", err)
+		return fmt.Errorf("can't send message: %w", err)
 	}
 
 	return nil
@@ -81,12 +79,12 @@ func (c *Client) FileInfo(fileId string) (*File, error) {
 
 	jsonRes, err := c.doRequest(getFileMethod, q)
 	if err != nil {
-		return nil, helpers.ErrWrapIfNotNil("can't get file", err)
+		return nil, fmt.Errorf("can't get file: %w", err)
 	}
 
 	res, err := c.fileResponse(jsonRes)
 	if err != nil {
-		return nil, helpers.ErrWrapIfNotNil("can't get file", err)
+		return nil, fmt.Errorf("can't get file: %w", err)
 	}
 
 	return &File{
@@ -104,14 +102,13 @@ func (c *Client) DownloadFile(filePath string) error {
 
 	_, err := grab.Get(config.VoicesFileDirectory, u.String())
 	if err != nil {
-		return helpers.ErrWrapIfNotNil("can't download file", err)
+		return fmt.Errorf("can't download file: %w", err)
 	}
 
 	return nil
 }
 
 func (c *Client) doRequest(method string, query url.Values) (data []byte, err error) {
-	defer func() { err = helpers.ErrWrapIfNotNil("can't send request", err) }()
 
 	u := url.URL{
 		Scheme: "https",
@@ -121,21 +118,21 @@ func (c *Client) doRequest(method string, query url.Values) (data []byte, err er
 
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't send request: %w", err)
 	}
 
 	req.URL.RawQuery = query.Encode()
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't send request: %w", err)
 	}
 
 	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't send request: %w", err)
 	}
 
 	return body, nil
@@ -146,7 +143,7 @@ func (c *Client) fileResponse(data []byte) (*GetFileResponse, error) {
 
 	err := json.Unmarshal(data, &r)
 	if err != nil {
-		return nil, helpers.ErrWrapIfNotNil("can't deserialize json response", err)
+		return nil, fmt.Errorf("can't deserialize json response: %w", err)
 	}
 
 	return &r, nil

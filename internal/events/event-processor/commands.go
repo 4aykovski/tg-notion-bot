@@ -1,52 +1,49 @@
 package eventProcessor
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/4aykovski/tg-notion-bot/config"
 	"github.com/4aykovski/tg-notion-bot/internal/client/telegram"
-	"github.com/4aykovski/tg-notion-bot/lib/helpers"
 	"go.uber.org/zap"
 )
 
-func (p *Processor) doCmdIfVoice(voice telegram.Voice, chatId int, username string) (err error) {
-	defer func() { err = helpers.ErrWrapIfNotNil("can't do command with voice", err) }()
+func (p *Processor) doCmdIfVoice(voice telegram.Voice, chatId int) (err error) {
 	f, err := p.tg.FileInfo(voice.FileId)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	if err := p.tg.DownloadFile(f.FilePath); err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	voiceText, err := p.speechAnalyzer.SpeechRecognizeOgg(fileName(f.FilePath))
 	if err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	editedText, err := p.aiBot.Completions(voiceText)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	err = p.not.CreateNewPageInDatabase(config.NotionDatabaseId, editedText)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	err = p.tg.SendMessage(chatId, msgSuccessfulSaved)
 	if err != nil {
-		return err
+		return fmt.Errorf("can't do command with voice: %w", err)
 	}
 
 	return nil
 }
 
 func (p *Processor) doCmdIfText(text string, chatID int, username string) (err error) {
-	defer func() { err = helpers.ErrWrapIfNotNil("can't do command with text", err) }()
-
 	text = strings.TrimSpace(text)
 
 	p.logger.Info("got new command",
@@ -55,7 +52,11 @@ func (p *Processor) doCmdIfText(text string, chatID int, username string) (err e
 
 	switch text {
 	default:
-		return p.tg.SendMessage(chatID, msgUnknownCommand)
+		err := p.tg.SendMessage(chatID, msgUnknownCommand)
+		if err != nil {
+			return fmt.Errorf("can't do command with text: %w", err)
+		}
+		return nil
 	}
 }
 
