@@ -8,11 +8,11 @@ import (
 	telegramClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/consumer/eventConsumer"
 	eventProcessor "github.com/4aykovski/tg-notion-bot/internal/events/event-processor"
-	zapLogger "github.com/4aykovski/tg-notion-bot/pkg/zap-logger"
+	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
 func main() {
-	logger := zapLogger.New(config.Type)
+	logger := Logger.New(config.Type)
 
 	tgClient, err := telegramClient.New(config.TgBotHost, config.TgBotToken)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	tgClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
 	"github.com/4aykovski/tg-notion-bot/lib/helpers"
-	zapLogger "github.com/4aykovski/tg-notion-bot/pkg/zap-logger"
+	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
 var (
@@ -32,7 +32,7 @@ type Processor struct {
 	aiBot          aiBot
 	not            *notion.Client
 	offset         int
-	logger         *zapLogger.Logger
+	logger         *Logger.Logger
 }
 
 type Meta struct {
@@ -56,7 +56,7 @@ func New(
 		speechAnalyzer: speechAnalyzer,
 		aiBot:          aiBot,
 		not:            notionClient,
-		logger:         zapLogger.New(config.Type),
+		logger:         Logger.New(config.Type),
 	}
 }
 func (p *Processor) Fetch(limit int) ([]events.Event, error) {

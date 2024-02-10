@@ -7,7 +7,7 @@ import (
 
 	"github.com/4aykovski/tg-notion-bot/config"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
-	zapLogger "github.com/4aykovski/tg-notion-bot/pkg/zap-logger"
+	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 	"go.uber.org/zap"
 )
 
@@ -15,7 +15,7 @@ type Consumer struct {
 	fetcher   events.Fetcher
 	processor events.Processor
 	batchSize int
-	logger    *zapLogger.Logger
+	logger    *Logger.Logger
 }
 
 func New(fetcher events.Fetcher, processor events.Processor, batchSize int) *Consumer {
@@ -23,7 +23,7 @@ func New(fetcher events.Fetcher, processor events.Processor, batchSize int) *Con
 		fetcher:   fetcher,
 		processor: processor,
 		batchSize: batchSize,
-		logger:    zapLogger.New(config.Type),
+		logger:    Logger.New(config.Type),
 	}
 }
 
