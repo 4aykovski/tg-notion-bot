@@ -28,11 +28,11 @@ var (
 	NotionIntegrationToken = os.Getenv("NOTION_INTEGRATION_TOKEN")
 	SalutespeechToken      = os.Getenv("SALUTESPEECH_ACCESS_TOKEN")
 	GigaChatToken          = os.Getenv("GIGACHAT_ACCESS_TOKEN")
-	PostgresHost           = "localhost"
-	PostgresPort           = 5432
-	PostgresUser           = "chaykovski"
+	PostgresHost           = os.Getenv("POSTGRES_HOST")
+	PostgresPort           = os.Getenv("POSTGRES_POST")
+	PostgresUser           = os.Getenv("POSTGRES_USER")
 	PostgresPassword       = os.Getenv("POSTGRESQL_CHAYKOVSKI_PASSWORD")
-	PostgresDbName         = "test"
-	PostgresDSN            = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	PostgresDbName         = os.Getenv("POSTGRES_DB_NAME")
+	PostgresDSNTemplate    = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		PostgresHost, PostgresPort, PostgresUser, PostgresPassword, PostgresDbName)
 )
