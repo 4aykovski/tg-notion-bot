@@ -24,14 +24,14 @@ type Client struct {
 	client   http.Client
 }
 
-func New(token string) (*Client, error) {
-	if token == "" {
+func New(cfg config.GigaChatConfig) (*Client, error) {
+	if cfg.Token == "" {
 		return nil, fmt.Errorf("can't create gigachat client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:     config.GigaChatHost,
-		basePath: config.GigaChatAPIBasePath,
-		token:    token,
+		host:     cfg.Host,
+		basePath: cfg.APIBasePath,
+		token:    cfg.Token,
 		client:   http.Client{},
 	}, nil
 }

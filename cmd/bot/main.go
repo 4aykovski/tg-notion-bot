@@ -12,24 +12,29 @@ import (
 )
 
 func main() {
-	logger := Logger.New(config.Type)
+	logger := Logger.New()
 
-	tgClient, err := telegramClient.New(config.TgBotHost, config.TgBotToken)
+	cfg, err := config.New()
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 
-	spClient, err := salutespeechClient.New(config.SalutespeechToken)
+	tgClient, err := telegramClient.New(cfg.Telegram, cfg.VoicesFileDirectory)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 
-	gcClient, err := gigachatClient.New(config.GigaChatToken)
+	spClient, err := salutespeechClient.New(cfg.Salutespeech, cfg.VoicesFileDirectory)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 
-	notClient, err := notion.New(config.NotionIntegrationToken)
+	gcClient, err := gigachatClient.New(cfg.GigaChat)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	notClient, err := notion.New(cfg.Notion)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -38,7 +43,7 @@ func main() {
 
 	logger.Info("service started")
 
-	consumer := eventConsumer.New(eP, eP, config.BatchSize)
+	consumer := eventConsumer.New(eP, eP, cfg.BatchSize)
 
 	if err := consumer.Start(); err != nil {
 		logger.Fatal(err.Error())

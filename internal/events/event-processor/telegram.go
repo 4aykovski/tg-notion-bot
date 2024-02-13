@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/4aykovski/tg-notion-bot/config"
 	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
 	tgClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
@@ -56,7 +55,7 @@ func New(
 		speechAnalyzer: speechAnalyzer,
 		aiBot:          aiBot,
 		not:            notionClient,
-		logger:         Logger.New(config.Type),
+		logger:         Logger.New(),
 	}
 }
 func (p *Processor) Fetch(limit int) ([]events.Event, error) {

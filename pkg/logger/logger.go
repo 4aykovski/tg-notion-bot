@@ -12,7 +12,7 @@ type Logger struct {
 	*zap.Logger
 }
 
-func New(config string) *Logger {
+func New() *Logger {
 	stdout := zapcore.AddSync(os.Stdout)
 
 	file := zapcore.AddSync(&lumberjack.Logger{

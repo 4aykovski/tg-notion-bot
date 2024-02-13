@@ -20,19 +20,21 @@ const (
 )
 
 type Client struct {
-	host     string
-	basePath string
-	client   http.Client
+	host                string
+	basePath            string
+	client              http.Client
+	voicesFileDirectory string
 }
 
-func New(host string, token string) (*Client, error) {
-	if token == "" {
+func New(cfg config.TelegramConfig, voicesFileDir string) (*Client, error) {
+	if cfg.Token == "" {
 		return nil, fmt.Errorf("can't create telegram client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:     host,
-		basePath: newBasePath(token),
-		client:   http.Client{},
+		host:                cfg.Host,
+		basePath:            newBasePath(cfg.Token),
+		client:              http.Client{},
+		voicesFileDirectory: voicesFileDir,
 	}, nil
 }
 
@@ -100,7 +102,7 @@ func (c *Client) DownloadFile(filePath string) error {
 		Path:   path.Join("file/" + c.basePath + "/" + filePath),
 	}
 
-	_, err := grab.Get(config.VoicesFileDirectory, u.String())
+	_, err := grab.Get(c.voicesFileDirectory, u.String())
 	if err != nil {
 		return fmt.Errorf("can't download file: %w", err)
 	}

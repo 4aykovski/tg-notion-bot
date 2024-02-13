@@ -19,27 +19,29 @@ var (
 )
 
 type Client struct {
-	host     string
-	basePath string
-	token    string
-	client   http.Client
+	host                string
+	basePath            string
+	token               string
+	client              http.Client
+	voicesFileDirectory string
 }
 
-func New(token string) (*Client, error) {
-	if token == "" {
+func New(cfg config.SalutespeechConfig, voicesFileDir string) (*Client, error) {
+	if cfg.Token == "" {
 		return nil, fmt.Errorf("can't create salutespeech client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:     config.SalutespeechHost,
-		basePath: config.SalutesleepchAPIBasePath,
-		token:    token,
-		client:   http.Client{},
+		host:                cfg.Host,
+		basePath:            cfg.APIBasePath,
+		token:               cfg.Token,
+		client:              http.Client{},
+		voicesFileDirectory: voicesFileDir,
 	}, nil
 }
 
 func (c *Client) SpeechRecognizeOgg(fileName string) (text string, err error) {
 
-	f, err := os.Open(filepath.Join(config.VoicesFileDirectory, fileName))
+	f, err := os.Open(filepath.Join(c.voicesFileDirectory, fileName))
 	if err != nil {
 		return "", fmt.Errorf("can't recognize speech: %w", err)
 	}

@@ -103,3 +103,5 @@ fabric.properties
 
 *.log
 *.oga
+
+.env

@@ -18,10 +18,11 @@ const (
 )
 
 type Client struct {
-	host     string
-	basePath string
-	token    string
-	client   http.Client
+	host          string
+	basePath      string
+	notionVersion string
+	token         string
+	client        http.Client
 }
 
 type JsonAnswer struct {
@@ -30,15 +31,16 @@ type JsonAnswer struct {
 	Name    string `json:"name,omitempty"`
 }
 
-func New(token string) (*Client, error) {
-	if token == "" {
+func New(cfg config.NotionConfig) (*Client, error) {
+	if cfg.IntegrationToken == "" {
 		return nil, fmt.Errorf("can't create notion client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:     config.NotionHost,
-		basePath: config.NotionAPIBasePath,
-		token:    token,
-		client:   http.Client{},
+		host:          cfg.Host,
+		basePath:      cfg.APIBasePath,
+		notionVersion: cfg.Version,
+		token:         cfg.IntegrationToken,
+		client:        http.Client{},
 	}, nil
 }
 
@@ -87,7 +89,7 @@ func (c *Client) doRequest(method string, body io.Reader) (err error) {
 
 	req.Header.Add("Content-Type", contentTypeJson)
 	req.Header.Add("Authorization", "Bearer "+c.token)
-	req.Header.Add("Notion-Version", config.NotionVersion)
+	req.Header.Add("Notion-Version", c.notionVersion)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

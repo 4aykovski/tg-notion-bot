@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/4aykovski/tg-notion-bot/config"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
 	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 	"go.uber.org/zap"
@@ -23,7 +22,7 @@ func New(fetcher events.Fetcher, processor events.Processor, batchSize int) *Con
 		fetcher:   fetcher,
 		processor: processor,
 		batchSize: batchSize,
-		logger:    Logger.New(config.Type),
+		logger:    Logger.New(),
 	}
 }
 
