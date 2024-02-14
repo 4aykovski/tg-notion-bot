@@ -16,7 +16,7 @@ const (
 )
 
 type Client struct {
-	hTTPClient    client.HTTPClient
+	hTTPClient    *client.HTTPClient
 	notionVersion string
 	token         string
 }
@@ -32,7 +32,7 @@ func New(cfg config.NotionConfig) (*Client, error) {
 		return nil, fmt.Errorf("can't create notion client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		hTTPClient:    *client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
+		hTTPClient:    client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
 		notionVersion: cfg.Version,
 		token:         cfg.IntegrationToken,
 	}, nil
@@ -50,8 +50,8 @@ func (c *Client) CreateNewPageInDatabase(dbId string, pageData string) (err erro
 		"Name": *newTitleProperty(pData.Name),
 	}
 	pageChildren := []block{
-		*newHeading2Block(pData.Summary),
-		*newParagraphBlock(pData.Result),
+		newHeading2Block(pData.Summary),
+		newParagraphBlock(pData.Result),
 	}
 	p := newPage(*pageParent, pageProperties, pageChildren)
 

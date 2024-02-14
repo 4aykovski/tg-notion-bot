@@ -20,7 +20,7 @@ const (
 )
 
 type Client struct {
-	hTTPClient          client.HTTPClient
+	hTTPClient          *client.HTTPClient
 	voicesFileDirectory string
 }
 
@@ -29,7 +29,7 @@ func New(cfg config.TelegramConfig, voicesFileDir string) (*Client, error) {
 		return nil, fmt.Errorf("can't create telegram client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		hTTPClient:          *client.NewHTTPClient(cfg.Host, newBasePath(cfg.Token)),
+		hTTPClient:          client.NewHTTPClient(cfg.Host, newBasePath(cfg.Token)),
 		voicesFileDirectory: voicesFileDir,
 	}, nil
 }

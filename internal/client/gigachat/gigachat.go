@@ -16,7 +16,7 @@ const (
 )
 
 type Client struct {
-	hTTPClient client.HTTPClient
+	hTTPClient *client.HTTPClient
 	token      string
 	client     http.Client
 }
@@ -26,7 +26,7 @@ func New(cfg config.GigaChatConfig) (*Client, error) {
 		return nil, fmt.Errorf("can't create gigachat client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		hTTPClient: *client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
+		hTTPClient: client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
 		token:      cfg.Token,
 		client:     http.Client{},
 	}, nil

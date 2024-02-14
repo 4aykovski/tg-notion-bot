@@ -86,16 +86,16 @@ type block struct {
 	Heading2  *heading2  `json:"heading_2,omitempty"`
 }
 
-func newParagraphBlock(text string) *block {
-	return &block{
+func newParagraphBlock(text string) block {
+	return block{
 		Object:    "block",
 		Type:      "paragraph",
 		Paragraph: newParagraph(text),
 	}
 }
 
-func newHeading2Block(text string) *block {
-	return &block{
+func newHeading2Block(text string) block {
+	return block{
 		Object:   "block",
 		Type:     "heading_2",
 		Heading2: newHeading2(text),

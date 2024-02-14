@@ -17,7 +17,7 @@ var (
 )
 
 type Client struct {
-	hTTPClient          client.HTTPClient
+	hTTPClient          *client.HTTPClient
 	token               string
 	voicesFileDirectory string
 }
@@ -27,7 +27,7 @@ func New(cfg config.SalutespeechConfig, voicesFileDir string) (*Client, error) {
 		return nil, fmt.Errorf("can't create salutespeech client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		hTTPClient:          *client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
+		hTTPClient:          client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
 		token:               cfg.Token,
 		voicesFileDirectory: voicesFileDir,
 	}, nil
