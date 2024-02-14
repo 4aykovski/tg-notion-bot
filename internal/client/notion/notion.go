@@ -67,7 +67,7 @@ func (c *Client) CreateNewPageInDatabase(dbId string, pageData string) (err erro
 	header.Add("Authorization", "Bearer "+c.token)
 	header.Add("Notion-Version", c.notionVersion)
 
-	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), nil, body, nil)
+	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, body, nil)
 	if err != nil {
 		return fmt.Errorf("can't create notion page: %w", err)
 	}
