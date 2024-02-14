@@ -22,8 +22,8 @@ func NewHTTPClient(host, basePath string) *HTTPClient {
 	}
 }
 
-func (hc *HTTPClient) Do(r http.Request) ([]byte, error) {
-	res, err := hc.client.Do(&r)
+func (hc *HTTPClient) Do(r *http.Request) ([]byte, error) {
+	res, err := hc.client.Do(r)
 	if err != nil {
 		return nil, fmt.Errorf("can't do request: %w", err)
 	}
