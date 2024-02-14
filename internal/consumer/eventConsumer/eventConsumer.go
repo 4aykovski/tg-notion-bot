@@ -10,14 +10,22 @@ import (
 	"go.uber.org/zap"
 )
 
+type Fetcher interface {
+	Fetch(limit int) ([]events.Event, error)
+}
+
+type Processor interface {
+	Process(e events.Event) error
+}
+
 type Consumer struct {
-	fetcher   events.Fetcher
-	processor events.Processor
+	fetcher   Fetcher
+	processor Processor
 	batchSize int
 	logger    *Logger.Logger
 }
 
-func New(fetcher events.Fetcher, processor events.Processor, batchSize int) *Consumer {
+func New(fetcher Fetcher, processor Processor, batchSize int) *Consumer {
 	return &Consumer{
 		fetcher:   fetcher,
 		processor: processor,
