@@ -46,16 +46,11 @@ func (c *Consumer) Start() error {
 			continue
 		}
 
-		if err := c.handleEvents(gotEvents); err != nil {
-			c.logger.Error("can't handle event",
-				zap.String("error", err.Error()))
-
-			continue
-		}
+		c.handleEvents(gotEvents)
 	}
 }
 
-func (c *Consumer) handleEvents(fetchedEvents []events.Event) error {
+func (c *Consumer) handleEvents(fetchedEvents []events.Event) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(fetchedEvents))
 	for _, event := range fetchedEvents {
@@ -76,6 +71,4 @@ func (c *Consumer) handleEvents(fetchedEvents []events.Event) error {
 		}(event)
 	}
 	wg.Wait()
-
-	return nil
 }
