@@ -30,7 +30,7 @@ func (hc *HTTPClient) Do(r *http.Request) ([]byte, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("can't do request: %w", fmt.Errorf("wrong status code on request to %s", res.Request.URL.String()))
+		return nil, fmt.Errorf("can't do request: %w", fmt.Errorf("wrong status code on request to %s: %d", res.Request.URL.String(), res.StatusCode))
 	}
 
 	body, err := io.ReadAll(res.Body)
