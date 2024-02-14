@@ -1,4 +1,4 @@
-package eventConsumer
+package event
 
 import (
 	"fmt"

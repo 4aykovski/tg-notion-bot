@@ -1,4 +1,4 @@
-package eventProcessor
+package processor
 
 import (
 	"fmt"

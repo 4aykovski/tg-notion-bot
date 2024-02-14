@@ -6,8 +6,8 @@ import (
 	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
 	salutespeechClient "github.com/4aykovski/tg-notion-bot/internal/client/salutespeech"
 	telegramClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
-	"github.com/4aykovski/tg-notion-bot/internal/consumer/eventConsumer"
-	eventProcessor "github.com/4aykovski/tg-notion-bot/internal/events/event-processor"
+	"github.com/4aykovski/tg-notion-bot/internal/consumer/event"
+	eventProcessor "github.com/4aykovski/tg-notion-bot/internal/events/processor"
 	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
@@ -43,7 +43,7 @@ func main() {
 
 	logger.Info("service started")
 
-	consumer := eventConsumer.New(eP, eP, cfg.BatchSize)
+	consumer := event.New(eP, eP, cfg.BatchSize)
 
 	if err := consumer.Start(); err != nil {
 		logger.Fatal(err.Error())
