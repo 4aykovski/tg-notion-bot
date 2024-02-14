@@ -3,14 +3,12 @@ package salutespeech
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/4aykovski/tg-notion-bot/config"
+	"github.com/4aykovski/tg-notion-bot/internal/client"
 )
 
 var (
@@ -19,10 +17,8 @@ var (
 )
 
 type Client struct {
-	host                string
-	basePath            string
+	hTTPClient          client.HTTPClient
 	token               string
-	client              http.Client
 	voicesFileDirectory string
 }
 
@@ -31,10 +27,8 @@ func New(cfg config.SalutespeechConfig, voicesFileDir string) (*Client, error) {
 		return nil, fmt.Errorf("can't create salutespeech client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:                cfg.Host,
-		basePath:            cfg.APIBasePath,
+		hTTPClient:          *client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
 		token:               cfg.Token,
-		client:              http.Client{},
 		voicesFileDirectory: voicesFileDir,
 	}, nil
 }
@@ -47,7 +41,17 @@ func (c *Client) SpeechRecognizeOgg(fileName string) (text string, err error) {
 	}
 	defer f.Close()
 
-	body, err := c.doPostRequest(speechRecognizeMethod, contentTypeOgg, f)
+	u := c.hTTPClient.GetUlrWithMethods(speechRecognizeMethod)
+	header := http.Header{}
+	header.Add("Authorization", "Bearer "+c.token)
+	header.Add("Content-Type", contentTypeOgg)
+
+	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, f, nil)
+	if err != nil {
+		return "", fmt.Errorf("can't recognize speech: %w", err)
+	}
+
+	body, err := c.hTTPClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("can't recognize speech: %w", err)
 	}
@@ -62,38 +66,4 @@ func (c *Client) SpeechRecognizeOgg(fileName string) (text string, err error) {
 	}
 
 	return result.Result[0], nil
-}
-
-func (c *Client) doPostRequest(method string, contentType string, requestBody io.Reader) (data []byte, err error) {
-
-	u := url.URL{
-		Scheme: "https",
-		Host:   c.host,
-		Path:   path.Join(c.basePath, method),
-	}
-
-	req, err := http.NewRequest(http.MethodPost, u.String(), requestBody)
-	if err != nil {
-		return nil, fmt.Errorf("can't do post request on salutespeech: %w", err)
-	}
-
-	req.Header.Add("Authorization", "Bearer "+c.token)
-	req.Header.Add("Content-Type", contentType)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("can't do post request on salutespeech: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("can't do post request on salutespeech: %w", fmt.Errorf("wrong status code: %d", res.StatusCode))
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("can't do post request on salutespeech: %w", err)
-	}
-
-	return body, nil
 }
