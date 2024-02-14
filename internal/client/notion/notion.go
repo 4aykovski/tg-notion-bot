@@ -3,13 +3,11 @@ package notion
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
-	"path"
 	"strings"
 
 	"github.com/4aykovski/tg-notion-bot/config"
+	"github.com/4aykovski/tg-notion-bot/internal/client"
 )
 
 const (
@@ -18,11 +16,9 @@ const (
 )
 
 type Client struct {
-	host          string
-	basePath      string
+	hTTPClient    client.HTTPClient
 	notionVersion string
 	token         string
-	client        http.Client
 }
 
 type JsonAnswer struct {
@@ -36,11 +32,9 @@ func New(cfg config.NotionConfig) (*Client, error) {
 		return nil, fmt.Errorf("can't create notion client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		host:          cfg.Host,
-		basePath:      cfg.APIBasePath,
+		hTTPClient:    *client.NewHTTPClient(cfg.Host, cfg.APIBasePath),
 		notionVersion: cfg.Version,
 		token:         cfg.IntegrationToken,
-		client:        http.Client{},
 	}, nil
 }
 
@@ -67,38 +61,20 @@ func (c *Client) CreateNewPageInDatabase(dbId string, pageData string) (err erro
 	}
 
 	body := strings.NewReader(string(jsonPage))
-	if err = c.doRequest(createPageMethod, body); err != nil {
+	u := c.hTTPClient.GetUlrWithMethods(createPageMethod)
+	header := http.Header{}
+	header.Add("Content-Type", contentTypeJson)
+	header.Add("Authorization", "Bearer "+c.token)
+	header.Add("Notion-Version", c.notionVersion)
+
+	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, body, nil)
+	if err != nil {
 		return fmt.Errorf("can't create notion page: %w", err)
 	}
 
-	return nil
-}
-
-func (c *Client) doRequest(method string, body io.Reader) (err error) {
-
-	u := url.URL{
-		Scheme: "https",
-		Host:   c.host,
-		Path:   path.Join(c.basePath, method),
-	}
-
-	req, err := http.NewRequest(http.MethodPost, u.String(), body)
+	_, err = c.hTTPClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("can't do request to notion: %w", err)
-	}
-
-	req.Header.Add("Content-Type", contentTypeJson)
-	req.Header.Add("Authorization", "Bearer "+c.token)
-	req.Header.Add("Notion-Version", c.notionVersion)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("can't do request to notion: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("can't do request to notion: %w", fmt.Errorf("wrong status code: %d", res.StatusCode))
+		return fmt.Errorf("can't create notion page: %w", err)
 	}
 
 	return nil
