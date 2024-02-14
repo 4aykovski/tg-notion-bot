@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 )
 
 type HTTPClient struct {
@@ -56,4 +57,18 @@ func (hc *HTTPClient) CreateRequest(method string, url string, header http.Heade
 	}
 
 	return req, nil
+}
+
+func (hc *HTTPClient) GetFullUrl() *url.URL {
+	return &url.URL{
+		Scheme: "https",
+		Host:   hc.Host,
+		Path:   path.Join(hc.BasePath, "/"),
+	}
+}
+
+func (hc *HTTPClient) GetUlrWithMethods(method string) *url.URL {
+	u := hc.GetFullUrl()
+	u.Path = path.Join(u.Path, method)
+	return u
 }
