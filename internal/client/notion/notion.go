@@ -61,13 +61,10 @@ func (c *Client) CreateNewPageInDatabase(dbId string, pageData string) (err erro
 	}
 
 	body := strings.NewReader(string(jsonPage))
-	u := c.hTTPClient.GetUlrWithMethods(createPageMethod)
-	header := http.Header{}
-	header.Add("Content-Type", contentTypeJson)
-	header.Add("Authorization", "Bearer "+c.token)
-	header.Add("Notion-Version", c.notionVersion)
 
-	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, body, nil)
+	u := c.hTTPClient.GetUlrWithMethods(createPageMethod)
+
+	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), nil, body, nil)
 	if err != nil {
 		return fmt.Errorf("can't create notion page: %w", err)
 	}

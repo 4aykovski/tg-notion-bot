@@ -20,7 +20,7 @@ const (
 )
 
 type Client struct {
-	HTTPClient          client.HTTPClient
+	hTTPClient          client.HTTPClient
 	voicesFileDirectory string
 }
 
@@ -29,7 +29,7 @@ func New(cfg config.TelegramConfig, voicesFileDir string) (*Client, error) {
 		return nil, fmt.Errorf("can't create telegram client: %w", fmt.Errorf("token wasn't specified"))
 	}
 	return &Client{
-		HTTPClient:          *client.NewHTTPClient(cfg.Host, newBasePath(cfg.Token)),
+		hTTPClient:          *client.NewHTTPClient(cfg.Host, newBasePath(cfg.Token)),
 		voicesFileDirectory: voicesFileDir,
 	}, nil
 }
@@ -44,14 +44,14 @@ func (c *Client) Updates(offset int, limit int) (updates []Update, err error) {
 	q.Add("offset", strconv.Itoa(offset))
 	q.Add("limit", strconv.Itoa(limit))
 
-	u := c.HTTPClient.GetUlrWithMethods(getUpdatesMethod)
+	u := c.hTTPClient.GetUlrWithMethods(getUpdatesMethod)
 
-	req, err := c.HTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
+	req, err := c.hTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
 	if err != nil {
 		return nil, fmt.Errorf("can't get file: %w", err)
 	}
 
-	res, err := c.HTTPClient.Do(req)
+	res, err := c.hTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("can't get file: %w", err)
 	}
@@ -70,14 +70,14 @@ func (c *Client) SendMessage(chatId int, text string) error {
 	q.Add("chat_id", strconv.Itoa(chatId))
 	q.Add("text", text)
 
-	u := c.HTTPClient.GetUlrWithMethods(sendMessageMethod)
+	u := c.hTTPClient.GetUlrWithMethods(sendMessageMethod)
 
-	req, err := c.HTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
+	req, err := c.hTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
 	if err != nil {
 		return fmt.Errorf("can't send message: %w", err)
 	}
 
-	_, err = c.HTTPClient.Do(req)
+	_, err = c.hTTPClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("can't send message: %w", err)
 	}
@@ -89,14 +89,14 @@ func (c *Client) FileInfo(fileId string) (*File, error) {
 	q := url.Values{}
 	q.Add("file_id", fileId)
 
-	u := c.HTTPClient.GetUlrWithMethods(getFileMethod)
+	u := c.hTTPClient.GetUlrWithMethods(getFileMethod)
 
-	req, err := c.HTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
+	req, err := c.hTTPClient.CreateRequest(http.MethodGet, u.String(), nil, nil, q)
 	if err != nil {
 		return nil, fmt.Errorf("can't get file: %w", err)
 	}
 
-	res, err := c.HTTPClient.Do(req)
+	res, err := c.hTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("can't get file: %w", err)
 	}
@@ -115,8 +115,8 @@ func (c *Client) FileInfo(fileId string) (*File, error) {
 func (c *Client) DownloadFile(filePath string) error {
 	u := url.URL{
 		Scheme: "https",
-		Host:   c.HTTPClient.Host,
-		Path:   path.Join("file", c.HTTPClient.BasePath, filePath),
+		Host:   c.hTTPClient.Host,
+		Path:   path.Join("file", c.hTTPClient.BasePath, filePath),
 	}
 
 	_, err := grab.Get(c.voicesFileDirectory, u.String())
