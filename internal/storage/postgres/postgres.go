@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/4aykovski/tg-notion-bot/config"
+	"github.com/4aykovski/tg-notion-bot/internal/storage"
 	_ "github.com/lib/pq"
 )
 
@@ -15,7 +16,7 @@ type Postgres struct {
 func NewPostgresDatabase(cfg config.DatabaseConfig) (*Postgres, error) {
 	db, err := NewConnection(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantCreateNewPostgresDatabase, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantCreateNewDatabase, err)
 	}
 
 	return &Postgres{db}, nil
@@ -26,12 +27,12 @@ func NewConnection(cfg config.DatabaseConfig) (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantCreateDatabaseConnection, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantCreateDatabaseConnection, err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantPingDatabase, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantPingDatabase, err)
 	}
 
 	return db, nil

@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	ErrCantCreateNewPostgresDatabase = errors.New("can't create new postgres database")
-	ErrCantCreateDatabaseConnection  = errors.New("can't create database connection")
-	ErrCantPingDatabase              = errors.New("can't ping database")
-	ErrCantCreateUser                = errors.New("can't create new user")
-	ErrCantGetUser                   = errors.New("can't get user")
+	ErrCantCreateNewDatabase        = errors.New("can't create new database")
+	ErrCantCreateDatabaseConnection = errors.New("can't create database connection")
+	ErrCantPingDatabase             = errors.New("can't ping database")
+	ErrCantCreateUser               = errors.New("can't create new user")
+	ErrCantGetUser                  = errors.New("can't get user")
 )
 
 type UserRepository interface {

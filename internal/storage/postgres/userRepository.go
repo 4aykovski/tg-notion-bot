@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/4aykovski/tg-notion-bot/internal/models"
+	"github.com/4aykovski/tg-notion-bot/internal/storage"
 )
 
 type UserRepository struct {
@@ -19,7 +20,7 @@ func (repo *UserRepository) CreateUser(user *models.User) (*models.User, error) 
 
 	_, err := repo.db.ExecContext(context.Background(), q, user.Id, user.Name)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantCreateUser, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantCreateUser, err)
 	}
 
 	return user, nil
@@ -34,12 +35,12 @@ func (repo *UserRepository) GetUser(id string) (*models.User, error) {
 
 	rows, err := repo.db.QueryContext(context.Background(), q, id)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantGetUser, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantGetUser, err)
 	}
 
 	var user *models.User
 	if err = rows.Scan(user); err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantGetUser, err)
+		return nil, fmt.Errorf("%w: %w", storage.ErrCantGetUser, err)
 	}
 
 	return user, nil
