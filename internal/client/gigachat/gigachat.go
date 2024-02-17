@@ -13,12 +13,10 @@ import (
 )
 
 const (
-	contentTypeJson       = "application/json"
-	completionsMethod     = "/chat/completions"
-	authUrl               = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
-	contentTypeUrlEncoded = "application/x-www-form-urlencoded"
-	dataScope             = "GIGACHAT_API_PERS"
-	rqUid                 = "6f0b1291-c7f3-43c6-bb2e-9f3efb2dc98e"
+	completionsMethod = "/chat/completions"
+	authUrl           = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+	dataScope         = "GIGACHAT_API_PERS"
+	rqUid             = "6f0b1291-c7f3-43c6-bb2e-9f3efb2dc98e"
 )
 
 var (
@@ -79,8 +77,8 @@ func (c *Client) Completions(text string) (string, error) {
 func (c *Client) createCompletionHeader() http.Header {
 	return http.Header{
 		"Authorization": []string{"Bearer " + c.token},
-		"Content-Type":  []string{contentTypeJson},
-		"Accept":        []string{contentTypeJson},
+		"Content-Type":  []string{client.ContentTypeJson},
+		"Accept":        []string{client.ContentTypeJson},
 	}
 }
 
@@ -115,9 +113,9 @@ func (c *Client) updateToken() error {
 
 	header := http.Header{}
 	header.Add("Authorization", "Bearer "+c.auth)
-	header.Add("Content-Type", contentTypeUrlEncoded)
+	header.Add("Content-Type", client.ContentTypeUrlEncoded)
 	header.Add("RqUID", rqUid)
-	header.Add("Accept", contentTypeJson)
+	header.Add("Accept", client.ContentTypeJson)
 
 	body := url.Values{}
 	body.Set("scope", dataScope)
