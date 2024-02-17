@@ -50,6 +50,7 @@ type SalutespeechConfig struct {
 	Host        string
 	APIBasePath string
 	Token       string
+	Auth        string
 }
 
 func New() (*Config, error) {
@@ -95,6 +96,7 @@ func New() (*Config, error) {
 			Host:        "smartspeech.sber.ru",
 			APIBasePath: "/rest/v1/",
 			Token:       os.Getenv("SALUTESPEECH_ACCESS_TOKEN"),
+			Auth:        os.Getenv("SALUTESPEECH_AUTH_TOKEN"),
 		},
 		VoicesFileDirectory: "./voices/",
 		BatchSize:           batchSize,
