@@ -74,7 +74,7 @@ func (c *Client) Completions(text string) (string, error) {
 	return result.Choices[0].Message.Content, nil
 }
 
-func (c *Client) createCompletionRequest(jsonBody []byte) (*http.Request, error) {
+func (c *Client) completionRequest(jsonBody []byte) ([]byte, error) {
 	u := c.hTTPClient.GetUlrWithMethods(completionsMethod)
 	header := http.Header{
 		"Authorization": []string{"Bearer " + c.token},
@@ -84,16 +84,7 @@ func (c *Client) createCompletionRequest(jsonBody []byte) (*http.Request, error)
 
 	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, strings.NewReader(string(jsonBody)), nil)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrCantCreateCompletionRequest, err)
-	}
-
-	return req, nil
-}
-
-func (c *Client) completionRequest(jsonBody []byte) ([]byte, error) {
-	req, err := c.createCompletionRequest(jsonBody)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", ErrCantSendCompletionRequest, err)
 	}
 
 	res, err := c.hTTPClient.Do(req)
