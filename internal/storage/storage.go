@@ -16,5 +16,5 @@ var (
 
 type UserRepository interface {
 	CreateUser(user *models.User) (*models.User, error)
-	GetUser(id string) (*models.User, error)
+	GetUser(id int) (*models.User, error)
 }
