@@ -23,6 +23,7 @@ type Voice struct {
 
 type User struct {
 	Username string `json:"username"`
+	Id       int    `json:"id"`
 }
 
 type Chat struct {
