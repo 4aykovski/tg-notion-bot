@@ -43,6 +43,7 @@ type GigaChatConfig struct {
 	Host        string
 	APIBasePath string
 	Token       string
+	Auth        string
 }
 
 type SalutespeechConfig struct {
@@ -88,6 +89,7 @@ func New() (*Config, error) {
 			Host:        "gigachat.devices.sberbank.ru",
 			APIBasePath: "/api/v1/",
 			Token:       os.Getenv("GIGACHAT_ACCESS_TOKEN"),
+			Auth:        os.Getenv("GIGACHAT_AUTH_TOKEN"),
 		},
 		Salutespeech: SalutespeechConfig{
 			Host:        "smartspeech.sber.ru",
