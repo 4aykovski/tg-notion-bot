@@ -35,7 +35,7 @@ type Client struct {
 
 func New(cfg config.SalutespeechConfig, voicesFileDir string) (*Client, error) {
 	if cfg.Token == "" && cfg.Auth == "" {
-		return nil, fmt.Errorf("can't create salutespeech client: %w", client.ErrAuthInfoNotSpecified)
+		return nil, fmt.Errorf("salutespeech %w: %w", client.ErrCantCreateClient, client.ErrAuthInfoNotSpecified)
 	}
 
 	return &Client{

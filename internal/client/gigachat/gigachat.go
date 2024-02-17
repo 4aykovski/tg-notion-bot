@@ -20,9 +20,8 @@ const (
 )
 
 var (
-	ErrCantGetCompletion           = errors.New("can't get completion")
-	ErrCantCreateCompletionRequest = errors.New("can't create completion request")
-	ErrCantSendCompletionRequest   = errors.New("can't send completion request")
+	ErrCantGetCompletion         = errors.New("can't get completion")
+	ErrCantSendCompletionRequest = errors.New("can't send completion request")
 )
 
 type Client struct {
@@ -33,7 +32,7 @@ type Client struct {
 
 func New(cfg config.GigaChatConfig) (*Client, error) {
 	if cfg.Token == "" && cfg.Auth == "" {
-		return nil, fmt.Errorf("can't create gigachat client: %w", client.ErrAuthInfoNotSpecified)
+		return nil, fmt.Errorf("gigachat %w: %w", client.ErrCantCreateClient, client.ErrAuthInfoNotSpecified)
 	}
 
 	return &Client{
