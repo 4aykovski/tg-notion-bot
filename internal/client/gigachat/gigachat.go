@@ -74,17 +74,13 @@ func (c *Client) Completions(text string) (string, error) {
 	return result.Choices[0].Message.Content, nil
 }
 
-func (c *Client) createCompletionHeader() http.Header {
-	return http.Header{
+func (c *Client) createCompletionRequest(jsonBody []byte) (*http.Request, error) {
+	u := c.hTTPClient.GetUlrWithMethods(completionsMethod)
+	header := http.Header{
 		"Authorization": []string{"Bearer " + c.token},
 		"Content-Type":  []string{client.ContentTypeJson},
 		"Accept":        []string{client.ContentTypeJson},
 	}
-}
-
-func (c *Client) createCompletionRequest(jsonBody []byte) (*http.Request, error) {
-	u := c.hTTPClient.GetUlrWithMethods(completionsMethod)
-	header := c.createCompletionHeader()
 
 	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u.String(), header, strings.NewReader(string(jsonBody)), nil)
 	if err != nil {
