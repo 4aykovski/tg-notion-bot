@@ -29,8 +29,10 @@ func (hc *HTTPClient) Do(r *http.Request) ([]byte, error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("can't do request: %w", fmt.Errorf("wrong status code on request to %s: %d", res.Request.URL.String(), res.StatusCode))
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusUnauthorized {
+		return nil, fmt.Errorf("can't do request: %w", fmt.Errorf("%w to %s: %d", ErrWrongStatusCode, res.Request.URL.String(), res.StatusCode))
+	} else if res.StatusCode == http.StatusUnauthorized {
+		return nil, fmt.Errorf("can't do request: %w", fmt.Errorf("%w to %s", Err401StatusCode, res.Request.URL.String()))
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -45,7 +47,7 @@ func (hc *HTTPClient) Do(r *http.Request) ([]byte, error) {
 func (hc *HTTPClient) CreateRequest(method string, url string, header http.Header, body io.Reader, query url.Values) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		return nil, fmt.Errorf("can't create request: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrCantCreateRequest, err)
 	}
 
 	if header != nil {

@@ -43,12 +43,14 @@ type GigaChatConfig struct {
 	Host        string
 	APIBasePath string
 	Token       string
+	Auth        string
 }
 
 type SalutespeechConfig struct {
 	Host        string
 	APIBasePath string
 	Token       string
+	Auth        string
 }
 
 func New() (*Config, error) {
@@ -88,11 +90,13 @@ func New() (*Config, error) {
 			Host:        "gigachat.devices.sberbank.ru",
 			APIBasePath: "/api/v1/",
 			Token:       os.Getenv("GIGACHAT_ACCESS_TOKEN"),
+			Auth:        os.Getenv("GIGACHAT_AUTH_TOKEN"),
 		},
 		Salutespeech: SalutespeechConfig{
 			Host:        "smartspeech.sber.ru",
 			APIBasePath: "/rest/v1/",
 			Token:       os.Getenv("SALUTESPEECH_ACCESS_TOKEN"),
+			Auth:        os.Getenv("SALUTESPEECH_AUTH_TOKEN"),
 		},
 		VoicesFileDirectory: "./voices/",
 		BatchSize:           batchSize,
