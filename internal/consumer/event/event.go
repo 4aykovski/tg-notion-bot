@@ -62,11 +62,8 @@ func (c *Consumer) handleEvents(fetchedEvents []events.Event) {
 				zap.Int("type", int(event.Type)))
 
 			if err := c.processor.Process(event); err != nil {
-				data := fmt.Sprintf("%v", event.Data)
 				c.logger.Error("can't handle event",
-					zap.String("error", err.Error()),
-					zap.String("data", data),
-					zap.Int("type", int(event.Type)))
+					zap.String("error", err.Error()))
 			}
 		}(event)
 	}
