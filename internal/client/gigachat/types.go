@@ -46,5 +46,6 @@ type choice struct {
 }
 
 type responseBody struct {
-	Choices []choice `json:"choices,omitempty"`
+	Choices     []choice `json:"choices,omitempty"`
+	AccessToken string   `json:"access_token,omitempty"`
 }
