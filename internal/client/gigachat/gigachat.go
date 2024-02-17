@@ -122,18 +122,18 @@ func (c *Client) updateToken() error {
 
 	req, err := c.hTTPClient.CreateRequest(http.MethodPost, u, header, strings.NewReader(body.Encode()), nil)
 	if err != nil {
-		return fmt.Errorf("can't update token: %w", err)
+		return fmt.Errorf("%w: %w", client.ErrCantUpdateToken, err)
 	}
 
 	res, err := c.hTTPClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("can't update token: %w", err)
+		return fmt.Errorf("%w: %w", client.ErrCantUpdateToken, err)
 	}
 
 	var result responseBody
 	err = json.Unmarshal(res, &result)
 	if err != nil {
-		return fmt.Errorf("can't update token: %w", err)
+		return fmt.Errorf("%w: %w", client.ErrCantUpdateToken, err)
 	}
 
 	c.token = result.AccessToken
