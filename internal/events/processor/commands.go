@@ -31,7 +31,7 @@ func (p *Processor) doCmdIfVoice(voice telegram.Voice, chatId int) (err error) {
 
 	notionDatabaseId := "42bc30c24c184db0a890018c009b69fd"
 
-	err = p.not.CreateNewPageInDatabase(notionDatabaseId, editedText)
+	err = p.notion.CreateNewPageInDatabase(notionDatabaseId, editedText)
 	if err != nil {
 		return fmt.Errorf("can't do command with voice: %w", err)
 	}
