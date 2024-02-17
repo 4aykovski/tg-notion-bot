@@ -12,9 +12,13 @@ type UserRepository struct {
 	db *Postgres
 }
 
+func NewUserRepository(db *Postgres) *UserRepository {
+	return &UserRepository{db: db}
+}
+
 func (repo *UserRepository) CreateUser(user *models.User) (*models.User, error) {
 	q := `
-		INSERT INTO users (id, name)
+		INSERT INTO "user" (id, name)
 		VALUES ($1, $2)
 	`
 
@@ -26,20 +30,17 @@ func (repo *UserRepository) CreateUser(user *models.User) (*models.User, error) 
 	return user, nil
 }
 
-func (repo *UserRepository) GetUser(id string) (*models.User, error) {
+func (repo *UserRepository) GetUser(id int) (*models.User, error) {
 	q := `
 		SELECT id, name
-		FROM users
+		FROM "user"
 		WHERE id = $1
 	`
 
-	rows, err := repo.db.QueryContext(context.Background(), q, id)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", storage.ErrCantGetUser, err)
-	}
+	row := repo.db.QueryRowContext(context.Background(), q, id)
 
 	var user *models.User
-	if err = rows.Scan(user); err != nil {
+	if err := row.Scan(user); err != nil {
 		return nil, fmt.Errorf("%w: %w", storage.ErrCantGetUser, err)
 	}
 
