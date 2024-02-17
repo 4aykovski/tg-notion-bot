@@ -8,6 +8,7 @@ import (
 	telegramClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/consumer/event"
 	eventProcessor "github.com/4aykovski/tg-notion-bot/internal/events/processor"
+	"github.com/4aykovski/tg-notion-bot/internal/storage/postgres"
 	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
@@ -39,7 +40,14 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
-	eP := eventProcessor.New(gcClient, spClient, tgClient, notClient)
+	psqlDatabase, err := postgres.NewPostgresDatabase(cfg.Database)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	userRepository := postgres.NewUserRepository(psqlDatabase)
+
+	eP := eventProcessor.New(gcClient, spClient, tgClient, notClient, userRepository)
 
 	logger.Info("service started")
 
@@ -48,5 +56,4 @@ func main() {
 	if err := consumer.Start(); err != nil {
 		logger.Fatal(err.Error())
 	}
-
 }
