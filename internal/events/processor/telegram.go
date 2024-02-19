@@ -1,12 +1,14 @@
 package processor
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
 	"github.com/4aykovski/tg-notion-bot/internal/client/notion"
 	tgClient "github.com/4aykovski/tg-notion-bot/internal/client/telegram"
 	"github.com/4aykovski/tg-notion-bot/internal/events"
+	"github.com/4aykovski/tg-notion-bot/internal/storage"
 	Logger "github.com/4aykovski/tg-notion-bot/pkg/logger"
 )
 
@@ -29,7 +31,8 @@ type Processor struct {
 	tg             *tgClient.Client
 	speechAnalyzer speechAnalyzer
 	aiBot          aiBot
-	not            *notion.Client
+	notion         *notion.Client
+	userRepository storage.UserRepository
 	offset         int
 	logger         *Logger.Logger
 }
@@ -37,6 +40,7 @@ type Processor struct {
 type Meta struct {
 	ChatID   int
 	Username string
+	UserId   int
 }
 
 type Data struct {
@@ -49,15 +53,18 @@ func New(
 	speechAnalyzer speechAnalyzer,
 	telegramClient *tgClient.Client,
 	notionClient *notion.Client,
+	repository storage.UserRepository,
 ) *Processor {
 	return &Processor{
 		tg:             telegramClient,
 		speechAnalyzer: speechAnalyzer,
 		aiBot:          aiBot,
-		not:            notionClient,
+		notion:         notionClient,
+		userRepository: repository,
 		logger:         Logger.New(),
 	}
 }
+
 func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 	updates, err := p.tg.Updates(p.offset, limit)
 	if err != nil {
@@ -89,13 +96,20 @@ func (p *Processor) Process(event events.Event) error {
 }
 
 func (p *Processor) processMessage(event events.Event) error {
-	meta, err := meta(event)
+	meta, err := getMeta(event)
 	if err != nil {
 		return fmt.Errorf("can't process event: %w", err)
 	}
-	data, err := data(event)
+	data, err := getData(event)
 	if err != nil {
 		return fmt.Errorf("can't process event: %w", err)
+	}
+
+	_, err = p.userRepository.GetUser(meta.UserId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("can't process event: %w", err)
+	} else if errors.Is(err, sql.ErrNoRows) {
+		return p.tg.SendMessage(meta.ChatID, "you're not allowed to use this bot!")
 	}
 
 	if data.Voice != (tgClient.Voice{}) {
@@ -111,7 +125,7 @@ func (p *Processor) processMessage(event events.Event) error {
 	return nil
 }
 
-func data(event events.Event) (Data, error) {
+func getData(event events.Event) (Data, error) {
 	res, ok := event.Data.(Data)
 	if !ok {
 		return Data{}, fmt.Errorf("can't get data: %w", ErrUnknownDataType)
@@ -120,7 +134,7 @@ func data(event events.Event) (Data, error) {
 	return res, nil
 }
 
-func meta(event events.Event) (Meta, error) {
+func getMeta(event events.Event) (Meta, error) {
 	res, ok := event.Meta.(Meta)
 	if !ok {
 		return Meta{}, fmt.Errorf("can't get meta: %w", ErrUnknownMetaType)
@@ -141,6 +155,7 @@ func event(update tgClient.Update) events.Event {
 		res.Meta = Meta{
 			ChatID:   update.Message.Chat.ID,
 			Username: update.Message.From.Username,
+			UserId:   update.Message.From.Id,
 		}
 	}
 
